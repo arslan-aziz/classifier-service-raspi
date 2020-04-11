@@ -1,0 +1,2 @@
+Purpose: This project deploys an image classifier neural network as a flask RESTful microservice in a Docker container.
+The goal is to POST request images from a Raspberry PI client with a camera, and GET request image class inference.
