@@ -6,7 +6,15 @@
         </TITLE>
     </HEAD>
     <BODY>
-        <P>This is an image.</P>
+        <P id="a">0 images have been uploaded.</P>
         <P><img src="/static/img/test.jpg"></P>
+        <!-- Event to reload page upon trigger from server-->
+        <SCRIPT type="text/javascript">
+            const evtSource = new EventSource("/stream");
+            evtSource.onmessage = function(e){
+                document.reload(true)
+                document.getElementById("a").innerHTML=e.data + " images have been uploaded."
+            }
+        </SCRIPT>
     </BODY>
 </HTML>

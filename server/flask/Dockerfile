@@ -3,11 +3,7 @@ FROM python:3.7.2-stretch
 #set working dir in container, make if it doesn't exist
 WORKDIR /app
 
-#install requirements
-#COPY REQUIREMENTS /app
-#RUN pip install -r REQUIREMENTS
-
-ADD REQUIREMENTS .
+COPY REQUIREMENTS .
 
 #COPY app.ini /app
 #COPY /app /app
@@ -18,6 +14,6 @@ ADD REQUIREMENTS .
 
 RUN pip install -r REQUIREMENTS
 
-ADD . .
+COPY . .
 
 CMD ["uwsgi","app.ini"]

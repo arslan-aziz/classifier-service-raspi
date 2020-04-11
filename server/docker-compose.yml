@@ -1,15 +1,14 @@
-version: "3.7"
+version: "3"
 
 services:
-
   flask:
     build: ./flask
     container_name: flask
     restart: unless-stopped
     environment:
       - APP_NAME=MyFlaskApp
-    expose:
-      - 8080
+    networks:
+      - net1
   
   nginx:
     build: ./nginx
@@ -17,3 +16,14 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+    networks:
+      - net1
+  redis:
+    image: redis:4.0-alpine
+    container_name: redis
+    networks:
+      - net1
+    command: [sh, -c, "rm -f /data/dump.rdb && redis-server"]
+
+networks:
+  net1:
