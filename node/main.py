@@ -29,11 +29,12 @@ def post_image(URL):
 my_parser = argparse.ArgumentParser(description="Capture and Post images")
 my_parser.add_argument("ServerIP",type=str,help="ip addr of web server")
 my_parser.add_argument("Port",type=str,help="port on web server")
+my_parser.add_argument("Sleep",type=int,help="time to sleep btw captures in ms")
 args = my_parser.parse_args()
 
 URL ="http://{addr}:{p}/upload_image".format(addr=args.ServerIP,p=args.Port)
 while(True):
 	response = post_image(URL)
 	print(str(response.status_code)+" "+response.reason)
-	time.sleep(2)
+	time.sleep(args.Sleep/1000)
 
