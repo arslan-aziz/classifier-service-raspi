@@ -1,20 +1,16 @@
 <!DOCTYPE html>
-<HTML>
-    <HEAD>
-        <TITLE>
-            Hello flask from HTML!
-        </TITLE>
-    </HEAD>
-    <BODY>
-        <P id="a">0 images have been uploaded.</P>
-        <P><img src="/static/img/test.jpg"></P>
-        <!-- Event to reload page upon trigger from server-->
-        <SCRIPT type="text/javascript">
-            const evtSource = new EventSource("/stream");
-            evtSource.onmessage = function(e){
-                document.reload(true)
-                document.getElementById("a").innerHTML=e.data + " images have been uploaded."
-            }
-        </SCRIPT>
-    </BODY>
-</HTML>
+<html>
+<head>
+  <title>Image Classifier Application</title>
+</head>
+<body>
+  <h1>Image Classifier Application</h1>
+  <P><img src="/static/img/test.jpg"></P>
+  <script>
+    var source = new EventSource("/stream");
+    source.onmessage = function(event) {
+        window.location.reload(true)
+    }
+  </script>
+</body>
+</html>

@@ -7,17 +7,12 @@ services:
     restart: unless-stopped
     environment:
       - APP_NAME=MyFlaskApp
-    networks:
-      - net1
-  
-  nginx:
-    build: ./nginx
-    container_name: nginx
-    restart: unless-stopped
     ports:
       - "80:80"
     networks:
       - net1
+    command: gunicorn --bind :80 --worker-class gevent app:app
+
   redis:
     image: redis:4.0-alpine
     container_name: redis

@@ -16,4 +16,4 @@ RUN pip install -r REQUIREMENTS
 
 COPY . .
 
-CMD ["uwsgi","app.ini"]
+#CMD ["uwsgi","app.ini"]

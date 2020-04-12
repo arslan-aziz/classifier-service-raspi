@@ -1,9 +1,16 @@
 from app import app
 from app import redis_store
-from flask import render_template, request, Response
+from flask import render_template, request, Response, stream_with_context
+#from app import sse
 import io
 import os
 import base64
+import json
+
+#TODO: how to pass a dictionary according to SSE standard?
+def publish(data):
+    msg_json = json.dumps({"data":data,"type":"message"})
+    return redis_store.publish('label',msg_json)
 
 @app.route("/")
 def index():
@@ -17,30 +24,30 @@ def upload_image():
     path = os.path.join('app','static','img','test.jpg')
     with open(path,'wb+') as f:
         f.write(img_bytes)
-    redis_store.publish('label',str(redis_store.get('image_counter')))
+    publish(str(redis_store.get('image_counter')))
     redis_store.incr('image_counter')
     return "done"
 
-# @app.route("/image_count",methods=['GET'])
-# def get_count():
-#     return """
-#     <!doctype html>
-#     <TITLE> {c} </TITLE>
-#     <BODY> {c} </BODY>
-#     """.format(c=redis_store.get('image_counter'))
-
+# @app.route('/hello')
+# def publish_hello():
+#     publish("hello")
+#     return "Message sent!"            
 
 @app.route("/stream")
 def stream():
-    def event_stream():
+    @stream_with_context
+    def generator():
         pubsub = redis_store.pubsub()
         pubsub.subscribe('label')
-        for message in pubsub.listen():
-            print('message received')
-            yield 'data: {c}\n\n'.format(c=message['data'])
-    return Response(event_stream(),mimetype="text/event-stream")
+        for msg in pubsub.listen():
+            msg_load = msg
+            print(msg_load)
+            #msg_load = json.loads(msg)
+            #ignore subscribe messages
+            if(msg_load['type']) == "message":
+                yield "data:{value}\n\n".format(value=msg_load['data'])
 
-
-
-
-
+    return Response(
+        generator(),
+        mimetype='text/event-stream',
+    )
