@@ -10,18 +10,10 @@ import io
 import base64
 import argparse
 
-def capture_img():
-	my_stream = io.BytesIO()
-	with picamera.PiCamera() as camera:
-		camera.resolution = (640,480)
-		camera.start_preview()
-		time.sleep(2)
-		camera.capture(my_stream,'jpeg')
-	return my_stream
-
 def post_image(URL):
 	# acquire image as byte file stream
-	img = capture_img()
+	img = io.BytesIO()
+	camera.capture(img,'jpeg')
 	img_encoded = str(base64.b64encode(img.getvalue()),encoding='utf-8') #encode bytes data
 	response = requests.post(URL, data=img_encoded) #post string data
 	return response
@@ -33,6 +25,13 @@ my_parser.add_argument("Sleep",type=int,help="time to sleep btw captures in ms")
 args = my_parser.parse_args()
 
 URL ="http://{addr}:{p}/upload_image".format(addr=args.ServerIP,p=args.Port)
+
+camera = picamera.PiCamera()
+camera.resolution = (640,480)
+camera.start_preview()
+print("warming up camera")
+time.sleep(2)
+
 while(True):
 	response = post_image(URL)
 	print(str(response.status_code)+" "+response.reason)
