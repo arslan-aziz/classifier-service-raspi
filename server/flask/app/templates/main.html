@@ -5,11 +5,14 @@
 </head>
 <body>
   <h1>Image Classifier Application</h1>
-  <P><img src="/static/img/test.jpg"></P>
+  <div id="imgHolder"></div>
   <script>
     var source = new EventSource("/stream");
     source.onmessage = function(event) {
-        window.location.reload(true)
+      var image = new Image();
+      image.src = "data:image/jpg;base64," + event.data;
+      var build = '<img src="' + image + '">';
+      document.getElementById("imgHolder").innerHTML=build;
     }
   </script>
 </body>

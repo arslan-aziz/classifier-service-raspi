@@ -19,13 +19,15 @@ def index():
 @app.route("/upload_image",methods=['POST'])
 def upload_image():
     print(type(request.data))
-    img_bytes = base64.b64decode(request.data)
-    #TODO: this label will be assigned in the classifier service
+    #img_bytes = base64.b64decode(request.data)
+    publish(request.data) #string of byte64 encoded image
+    """
     path = os.path.join('app','static','img','test.jpg')
     with open(path,'wb+') as f:
         f.write(img_bytes)
     publish(str(redis_store.get('image_counter')))
     redis_store.incr('image_counter')
+    """
     return "done"       
 
 @app.route("/stream")
