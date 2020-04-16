@@ -26,12 +26,7 @@ def upload_image():
         f.write(img_bytes)
     publish(str(redis_store.get('image_counter')))
     redis_store.incr('image_counter')
-    return "done"
-
-# @app.route('/hello')
-# def publish_hello():
-#     publish("hello")
-#     return "Message sent!"            
+    return "done"       
 
 @app.route("/stream")
 def stream():
