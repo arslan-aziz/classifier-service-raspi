@@ -1,2 +1,5 @@
 picamera
 requests
+Flask
+gunicorn
+gevent
