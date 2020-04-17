@@ -1,15 +1,14 @@
 from flask import Flask
 import picamera
 import time
-from config.settings import BaseConfig
 
-app = Flask(__name__)
-app.config.from_object('BaseConfig')
+app = Flask(__name__,instance_relative_config=True)
+app.config.from_pyfile('flask.cfg')
 
 print(app.config.keys())
 
 camera = picamera.PiCamera()
-camera.resolution = (app.config['X_RES'],app.config['Y_RES'])
+camera.resolution = (int(app.config['X_RES']),int(app.config['Y_RES']))
 camera.start_preview()
 print("warming up camera")
 time.sleep(2)

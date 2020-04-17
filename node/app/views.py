@@ -14,11 +14,11 @@ def stream():
     @stream_with_context
     def generator():
         while True:
-            time.sleep(app.config['PERIOD']/1000)
+            time.sleep(int(app.config['PERIOD'])/1000)
             img = io.BytesIO()
-	        camera.capture(img,'jpeg')
-	        img_encoded = str(base64.b64encode(img.getvalue()),encoding='utf-8') #encode bytes data
-	        yield "data:{value}\n\n".format(value=img_encoded)
+            camera.capture(img,'jpeg')
+            img_encoded = str(base64.b64encode(img.getvalue()),encoding='utf-8') #encode bytes data
+	    yield "data:{value}\n\n".format(value=img_encoded)
 
     return Response(
         generator(),
