@@ -18,7 +18,7 @@ def stream():
             img = io.BytesIO()
             camera.capture(img,'jpeg')
             img_encoded = str(base64.b64encode(img.getvalue()),encoding='utf-8') #encode bytes data
-	    yield "data:{value}\n\n".format(value=img_encoded)
+            yield "data:{value}\n\n".format(value=img_encoded)
 
     return Response(
         generator(),
