@@ -3,3 +3,5 @@ redis
 gunicorn
 gevent
 Flask-SSE
+requests
+sseclient

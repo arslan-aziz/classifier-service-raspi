@@ -6,6 +6,9 @@ import io
 import os
 import base64
 import json
+import requests
+import logging
+from sseclient import SSEClient
 
 #TODO: how to pass a dictionary according to SSE standard?
 def publish(data):
@@ -29,6 +32,36 @@ def upload_image():
     redis_store.incr('image_counter')
     """
     return "done"       
+
+@app.route("/start_stream",methods=['GET'])
+def start_stream():
+    
+    URL = "http://192.168.1.23:8080/"
+    session = requests.Session()
+    messages = session.get(URL,stream=True)
+    app.logger.debug("receiving stream")
+
+    for msg in messages.iter_lines():
+        publish(msg)
+
+    #messages = SSEClient(URL)
+    # for msg in messages:
+    #     if msg.event=='message':
+    #         #app.logger.debug(str(type(msg.data)))
+    #         #app.logger.debug(msg.data)
+    #         publish(msg.data)
+    #r = requests.get("http://192.168.1.23:8080/",stream=True)
+    #for line in r.iter_content():
+        #print("original" + str(type(line)),flush=True)
+        #print("")
+        #print("decoded" + str(type(line.decode())),flush=True)
+        #if line:
+            #publish(line)
+            #print(line.content)
+            #app.logger.debug(str(type(line)))    
+            #publish()
+            #publish(json.loads(line.decode('utf-8')))
+    return "done"
 
 @app.route("/stream")
 def stream():
