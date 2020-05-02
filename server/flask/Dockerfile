@@ -1,4 +1,4 @@
-FROM python:3.7.2-stretch
+FROM python:3.7-slim
 
 #set working dir in container, make if it doesn't exist
 WORKDIR /app
