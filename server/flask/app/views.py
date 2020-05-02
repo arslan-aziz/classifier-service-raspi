@@ -8,7 +8,6 @@ import base64
 import json
 import requests
 import logging
-from sseclient import SSEClient
 
 #TODO: how to pass a dictionary according to SSE standard?
 def publish(data):
@@ -17,7 +16,7 @@ def publish(data):
 
 @app.route("/")
 def index():
-    return render_template('main.html')
+    return render_template('index.html')
 
 @app.route("/upload_image",methods=['POST'])
 def upload_image():
