@@ -11,7 +11,7 @@ services:
       - "80:80"
     networks:
       - net1
-    command: gunicorn --bind :80 --worker-class gevent app:app
+    command: gunicorn --bind :80 --worker-class gevent --log-level debug app:app
 
   redis:
     image: redis:4.0-alpine
