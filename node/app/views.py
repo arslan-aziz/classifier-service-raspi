@@ -19,10 +19,13 @@ def stream():
             camera.capture(img,'jpeg')
             img_encoded = str(base64.b64encode(img.getvalue()),encoding='utf-8') #encode bytes data
             print("sending image")
-            yield "data:{value}\n\n".format(value=img_encoded)
+            #yield "data:helloworld\n\n"
+            #yield "hello world"
+            yield img_encoded
+            #yield "data:{value}\n\n".format(value=img_encoded)
 
     return Response(
         generator(),
-        mimetype='text/event-stream',
+        mimetype='text/plain; encoding=utf-8',
     )
 
