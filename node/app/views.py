@@ -19,7 +19,9 @@ def genFeed(cam):
     while True:
         frame = cam.get_frame()
         yield(b'--frame\r\n' + \
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                b'Content-Type: image/jpeg\r\n\r\n' + \
+                    b'Content-Length:' + str(len(frame)).encode() + \
+                    frame + b'\r\n')
 
 @app.route('/stream')
 def stream():
