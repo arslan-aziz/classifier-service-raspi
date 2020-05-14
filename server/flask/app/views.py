@@ -1,5 +1,5 @@
 from app import app
-#from app import redis_store
+from app import redis_state
 from flask import render_template, request, Response, stream_with_context
 #from app import sse
 import io
@@ -8,12 +8,17 @@ import base64
 import json
 import requests
 import logging
+import time
 
 #TODO: how to pass a dictionary according to SSE standard?
 def publish(data):
     msg_json = json.dumps({"data":data,"type":"message"})
     return redis_store.publish('label',msg_json)
 
+"""
+Route index:
+HTML page displaying updated video stream using client-side JS SSE.
+"""
 @app.route("/")
 def index():
     return render_template('test.html')
@@ -32,44 +37,31 @@ def index():
 #     """
 #     return "done"       
 
-@app.route("/stream",methods=['GET'])
-def start_stream():
-    
-    URL = "http://192.168.1.23:8080/"
-    r = requests.get(URL,stream=True)
-    app.logger.debug("receiving stream")
+@app.route("/get_status", methods = ['GET'])
+def check_state():
+    if time.time() - float(redis_state.get('last_stream')) > 10:
+        return "stop"
+    else:
+        return "start"
 
-    for line in r.iter_lines():
-        app.logger.debug(line.decode())
+@app.route("/stream")
+def stream():
+    @stream_with_context
+    def generator():
+        #initialize time on connection
+        redis_state.set('last_stream',str(time.time()))
+        pubsub = redis_store.pubsub()
+        pubsub.subscribe('label')
+        for msg in pubsub.listen():
+            redis_state.set('last_stream',str(time.time()))
+            msg_load = msg
+            print(msg_load)
+            #msg_load = json.loads(msg)
+            #ignore subscribe messages
+            if(msg_load['type']) == "message":
+                yield "data:{value}\n\n".format(value=msg_load['data'])
 
-    #r = requests.get("http://192.168.1.23:8080/",stream=True)
-    #for line in r.iter_content():
-        #print("original" + str(type(line)),flush=True)
-        #print("")
-        #print("decoded" + str(type(line.decode())),flush=True)
-        #if line:
-            #publish(line)
-            #print(line.content)
-            #app.logger.debug(str(type(line)))    
-            #publish()
-            #publish(json.loads(line.decode('utf-8')))
-    return "done"
-
-# @app.route("/stream")
-# def stream():
-#     @stream_with_context
-#     def generator():
-#         pubsub = redis_store.pubsub()
-#         pubsub.subscribe('label')
-#         for msg in pubsub.listen():
-#             msg_load = msg
-#             print(msg_load)
-#             #msg_load = json.loads(msg)
-#             #ignore subscribe messages
-#             if(msg_load['type']) == "message":
-#                 yield "data:{value}\n\n".format(value=msg_load['data'])
-
-#     return Response(
-#         generator(),
-#         mimetype='text/event-stream',
-#     )
+    return Response(
+        generator(),
+        mimetype='text/event-stream',
+    )

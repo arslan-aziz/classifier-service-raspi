@@ -12,3 +12,13 @@ services:
     networks:
       - net1
     command: gunicorn --bind :80 --worker-class gevent --log-level debug app:app
+
+  redis:
+    image: redis:4.0-alpine
+    container_name: redis1
+    networks:
+      - net1
+    command: [sh, -c, "rm -f /data/dump.rdb && redis-server"]
+
+networks:
+  net1:
