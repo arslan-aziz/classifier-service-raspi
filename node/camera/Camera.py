@@ -2,6 +2,7 @@ import picamera
 import threading
 import time
 import io
+import cfg
 
 class Camera():
     thread = None
