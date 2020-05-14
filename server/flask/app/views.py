@@ -1,10 +1,9 @@
 from app import app
 from app import redis_state
+from app import redis_queue
 from flask import render_template, request, Response, stream_with_context
-#from app import sse
 import io
 import os
-import base64
 import json
 import requests
 import logging
