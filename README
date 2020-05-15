@@ -1,2 +1,17 @@
-Purpose: This project deploys an image classifier neural network as a flask RESTful microservice in a Docker container.
-The goal is to POST request images from a Raspberry PI client with a camera, and GET request image class inference.
+This project uses Docker to deploy a web architecture that streams video from an IoT device (RaspPi),
+performing CV transformations (use case to be decided), to a browser.
+
+5/14/20:
+- Video streams from the IoT device to the Flask web server via a Redis PubSub
+- The web server maintains whether clients are connected or not in a Redis cache.
+- The IoT device polls the webserver in a separate thread to update its state and determine whether to acquire video.
+- The browser streams video to the browser (>30 fps on local net) as multipart/mixed data
+
+TODO:
+- Alternative queue/stream brokers to improve latency
+- Implement image transformation/CV layer as a container
+- Determine a user story to drive implementation of AI/ML features
+
+Longshots:
+- Productionize and deploy web server on cloud-service provider
+- Build video capture into an Android mobile app 
