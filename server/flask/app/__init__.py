@@ -5,7 +5,7 @@ import time
 
 #TODO: this should be in config file
 redis_state = StrictRedis.from_url("redis://redis1:6379/0",decode_responses = True)
-redis_queue = StrictRedis.from_url("redis://redis2:6379/0",decode_responses = False)
+redis_pubsub = StrictRedis.from_url("redis://redis2:6379/0",decode_responses = False)
 
 #initialize redis variables
 redis_state.set('last_stream',str(time.time()))

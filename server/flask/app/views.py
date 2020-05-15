@@ -1,13 +1,14 @@
 from app import app
 from app import redis_state
-from app import redis_queue
+from app import redis_pubsub
 from flask import render_template, request, Response, stream_with_context
 import io
 import os
 import json
 import requests
-import logging
 import time
+import base64
+from PIL import Image
 
 #TODO: how to pass a dictionary according to SSE standard?
 def publish(data):
@@ -22,26 +23,19 @@ HTML page displaying updated video stream using client-side JS SSE.
 def index():
     return render_template('test.html')
 
-# @app.route("/upload_image",methods=['POST'])
-# def upload_image():
-#     print(type(request.data))
-#     #img_bytes = base64.b64decode(request.data)
-#     publish(request.data) #string of byte64 encoded image
-#     """
-#     path = os.path.join('app','static','img','test.jpg')
-#     with open(path,'wb+') as f:
-#         f.write(img_bytes)
-#     publish(str(redis_store.get('image_counter')))
-#     redis_store.incr('image_counter')
-#     """
-#     return "done"       
+@app.route("/get_an_image", methods = ['GET'])
+def get_an_image():
+    msg = redis_pubsub.get("image")
+    img = Image.open(io.BytesIO(msg))
+    img.save(app.root_path  + "/static/img/test.jpg")
+    return render_template("image.html")
 
 @app.route("/get_status", methods = ['GET'])
 def check_state():
     if time.time() - float(redis_state.get('last_stream')) > 10:
-        return "stop"
+        return "False"
     else:
-        return "start"
+        return "True"
 
 @app.route("/stream")
 def stream():
@@ -49,18 +43,25 @@ def stream():
     def generator():
         #initialize time on connection
         redis_state.set('last_stream',str(time.time()))
-        pubsub = redis_store.pubsub()
+        pubsub = redis_pubsub.pubsub()
         pubsub.subscribe('label')
         for msg in pubsub.listen():
             redis_state.set('last_stream',str(time.time()))
-            msg_load = msg
-            print(msg_load)
-            #msg_load = json.loads(msg)
             #ignore subscribe messages
-            if(msg_load['type']) == "message":
-                yield "data:{value}\n\n".format(value=msg_load['data'])
+            if(msg['type']) == "message":
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + msg['data'] + b'\r\n'
+                )
 
-    return Response(
-        generator(),
-        mimetype='text/event-stream',
-    )
+                # app.logger.debug(str(type(msg['data'])))
+                # img_encoded = base64.b64encode(msg['data']).decode('ascii')
+                # app.logger.debug(str(type(img_encoded)))
+                # yield "data:{value}\n\n".format(value = img_encoded)
+
+    # return Response(
+    #     generator(),
+    #     mimetype='text/event-stream',
+    # )
+
+    return Response(generator(),
+                    mimetype = 'multipart/x-mixed-replace; boundary=frame')
