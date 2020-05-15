@@ -30,15 +30,15 @@ class Camera():
     def stream(cls):
         with picamera.PiCamera() as camera:
             camera.resolution = (320,240)
-            camera.hflip = True
-            camera.vflip = True
+            camera.hflip = False
+            camera.vflip = False
 
             #warm up camera
             camera.start_preview()
             time.sleep(2)
 
             stream = io.BytesIO()
-            for __ in camera.capture_continuous(stream,'jpeg',use_video_port=True):
+            for __ in camera.capture_continuous(stream,format = 'jpeg',use_video_port=True):
 
                 #store frame
                 stream.seek(0)
